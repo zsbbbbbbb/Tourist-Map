@@ -1,107 +1,17 @@
 <!doctype html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <style>
-        html,body,#container { width:100%;height:100%;margin:0;padding:0 }
-    </style>
-    <script src="https://webapi.amap.com/maps?v=2.0&key=2924b39d053d3dd9008c5dc0593094f8"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>我们的旅行足迹</title>
+  <link rel="stylesheet" href="./css/index.css">
 </head>
 <body>
-<div id="container"></div>
+  <div id="container"></div>
+  <div class="city-count" id="cityCount">已点亮 0 个城市</div>
 
-<script>
-// 1. 初始化地图
-var map = new AMap.Map("container", {
-  center: [108.9236, 34.5575],
-  zoom: 5,
-  mapStyle: "amap://styles/grey"
-});
-
-// 2. 城市列表
-const CITY_LIST = [
-  "kunming","dali","lijiang","diqing","nanjing","shaoxingshi",
-  "xiamen","changsha","ningbo","shanghai","suzhou","jinhua",
-  "quzhou","guangzhou","hangzhou","huzhou","ningde","taizhou",
-  "wenzhou","wuhan"
-];
-
-// 3. 全局存储多边形
-let polygons = [];
-
-// 4. 坐标格式兼容处理（核心修复！）
-function normalizePath(coords) {
-  // 兼容三维/二维数组，统一转成高德需要的格式
-  if (Array.isArray(coords[0][0])) {
-    return coords[0]; // 三维数组取第一层
-  }
-  return coords; // 二维数组直接返回
-}
-
-// 5. 绘制城市
-function addCityPolygon(boundaries, cityName) {
-  // 统一坐标格式后再循环
-  const path = normalizePath(boundaries);
-  let polygon = new AMap.Polygon({
-    path: path,
-    fillColor: "#FF4444",
-    strokeColor: "#fff",
-    fillOpacity: 0.7,
-    strokeWeight: 1,
-    bubble: true // 透传点击事件
-  });
-
-  // 悬浮效果
-  polygon.on("mouseover", () => polygon.setOptions({ fillColor: "#fff" }));
-  polygon.on("mouseout", () => polygon.setOptions({ fillColor: "#FF4444" }));
-
-  // 直接给多边形绑点击（双重保险）
-  polygon.on("click", (e) => {
-    new AMap.InfoWindow({
-      content: `<div style="padding:12px 20px;">
-                  <h4 style="margin:0;">${cityName}</h4>
-                </div>`,
-      offset: new AMap.Pixel(0, -15)
-    }).open(map, e.lngLat);
-  });
-
-  map.add(polygon);
-  polygons.push({ poly: polygon, name: cityName });
-}
-
-// 6. 批量加载
-async function loadAllCities() {
-  for (let city of CITY_LIST) {
-    try {
-      let res = await fetch(`./json/${city}.geojson`);
-      if (!res.ok) throw new Error(`文件加载失败: ${city}`);
-      let data = await res.json();
-      let coords = data.features[0].geometry.coordinates;
-      addCityPolygon(coords, city);
-      console.log(`✅ 加载成功: ${city}`);
-    } catch (e) {
-      console.error(`❌ 加载失败: ${city}`, e);
-    }
-  }
-}
-
-// 7. 全局点击兜底（双重保险）
-map.on("click", function(e) {
-  for (let item of polygons) {
-    if (item.poly.contains(e.lngLat)) {
-      new AMap.InfoWindow({
-        content: `<div style="padding:12px 20px;">
-                    <h4 style="margin:0;">${item.name}</h4>
-                  </div>`,
-        offset: new AMap.Pixel(0, -15)
-      }).open(map, e.lngLat);
-      break;
-    }
-  }
-});
-
-// 8. 启动加载
-loadAllCities();
-</script>
-</body>
+  <script src="https://webapi.amap.com/maps?v=2.0&key=2924b39d053d3dd9008c5dc0593094f8"></script>
+  <script src="./js/cityData.js"></script>
+  <script src="./js/index.js"></script>
+  </body>
 </html>
