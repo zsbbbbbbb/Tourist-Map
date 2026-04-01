@@ -47,8 +47,8 @@ const cityInfo = {
   },
   kunming: {
     name: "昆明",
-    imgs: ["https://picsum.photos/400/300?random=10"],
-    desc: "昆明介绍"
+    imgs: ["../img/kunming/km.jpg"],
+    desc: "海埂大坝喂海鸥，石林没有去"
   },
   dali: {
     name: "大理",

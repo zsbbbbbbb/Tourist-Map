@@ -5,6 +5,15 @@ var map = new AMap.Map("container", {
 });
 
 let successCount = 0;
+let allPolygons = []; // 存储所有城市多边形，用于自动适配视野
+
+// 城市列表（确保作用域正确）
+// const CITY_LIST = [
+//   "jinhua","hangzhou","ningbo","shanghai","shaoxingshi",
+//   "wenzhou","taizhou","ningde","nanjing","kunming",
+//   "dali","lijiang","diqing","guangzhou","changsha",
+//   "suzhou","wuhan","huzhou","quzhou","xiamen"
+// ];
 
 function addCityPolygon(boundaries, city) {
   boundaries.forEach(path => {
@@ -16,18 +25,20 @@ function addCityPolygon(boundaries, city) {
       strokeWeight: 1
     });
 
-    polygon.on("mouseover", () => {
-      polygon.setOptions({ fillColor: "#FF8888", strokeWeight: 2 });
-      map.setDefaultCursor("pointer");
-    });
+    // 将多边形加入数组
+    allPolygons.push(polygon);
 
+    polygon.on("mouseover", () => {
+        polygon.setOptions({ fillColor: "#FF8888", strokeWeight: 2 });
+        map.setDefaultCursor("pointer");
+    });
     polygon.on("mouseout", () => {
-      polygon.setOptions({ fillColor: "#FF4444", strokeWeight: 1 });
-      map.setDefaultCursor("default");
+        polygon.setOptions({ fillColor: "#FF4444", strokeWeight: 1 });
+        map.setDefaultCursor("default");
     });
 
     polygon.on("click", function(e) {
-      // 安全判断（不报错、不崩溃）
+      // 安全判断
       if (typeof cityInfo === "undefined" || !cityInfo[city]) {
         return;
       }
@@ -55,13 +66,6 @@ function addCityPolygon(boundaries, city) {
   });
 }
 
-const CITY_LIST = [
-  "jinhua","hangzhou","ningbo","shanghai","shaoxingshi",
-  "wenzhou","taizhou","ningde","nanjing","kunming",
-  "dali","lijiang","diqing","guangzhou","changsha",
-  "suzhou","wuhan","huzhou","quzhou","xiamen"
-];
-
 async function loadAllCities() {
   for (let city of CITY_LIST) {
     try {
@@ -78,6 +82,16 @@ async function loadAllCities() {
       console.error("加载失败：", city, e);
     }
   }
+
+  // 🔥 加载完所有城市后，自动适配视野（移动端/PC端都完美显示）
+  setTimeout(() => {
+    if (allPolygons.length > 0) {
+      map.setFitView(allPolygons, {
+        padding: [60, 30, 100, 30], // 上、右、下、左留白，避开底部栏
+        zoomEnable: true
+      });
+    }
+  }, 300);
 }
 
 loadAllCities();
