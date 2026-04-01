@@ -7,14 +7,6 @@ var map = new AMap.Map("container", {
 let successCount = 0;
 let allPolygons = []; // 存储所有城市多边形，用于自动适配视野
 
-// 城市列表（确保作用域正确）
-// const CITY_LIST = [
-//   "jinhua","hangzhou","ningbo","shanghai","shaoxingshi",
-//   "wenzhou","taizhou","ningde","nanjing","kunming",
-//   "dali","lijiang","diqing","guangzhou","changsha",
-//   "suzhou","wuhan","huzhou","quzhou","xiamen"
-// ];
-
 function addCityPolygon(boundaries, city) {
   boundaries.forEach(path => {
     let polygon = new AMap.Polygon({
