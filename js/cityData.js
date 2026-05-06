@@ -99,5 +99,8 @@ const cityInfo = {
     name: "厦门",
     imgs: ["https://picsum.photos/400/300?random=20"],
     desc: "厦门介绍"
+  },
+  chongqing: {
+    name: "重庆"
   }
 };
